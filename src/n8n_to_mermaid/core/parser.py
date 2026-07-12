@@ -18,6 +18,11 @@ def workflow_to_graph(
     if not all(isinstance(node, Mapping) for node in raw_nodes):
         raise ValueError("Invalid n8n workflow: every node must be an object.")
 
+    source_nodes = [
+        node
+        for node in raw_nodes
+        if not _is_sticky_note(node) and (include_disabled or not node.get("disabled", False))
+    ]
     parsed_nodes = tuple(
         Node(
             id=f"n{index + 1}",
@@ -25,8 +30,7 @@ def workflow_to_graph(
             type=str(node.get("type", "")),
             disabled=bool(node.get("disabled", False)),
         )
-        for index, node in enumerate(raw_nodes)
-        if include_disabled or not node.get("disabled", False)
+        for index, node in enumerate(source_nodes)
     )
     identifiers = {node.name: node.id for node in parsed_nodes}
     if len(identifiers) != len(parsed_nodes):
@@ -47,6 +51,11 @@ def workflow_to_graph(
 def _node_name(node: Mapping[str, Any], index: int) -> str:
     name = node.get("name")
     return str(name) if name is not None else f"Unnamed node {index + 1}"
+
+
+def _is_sticky_note(node: Mapping[str, Any]) -> bool:
+    """Sticky Note node'ları diyagramın işlem akışına ait değildir."""
+    return str(node.get("type", "")).endswith(".stickyNote")
 
 
 def _parse_edges(

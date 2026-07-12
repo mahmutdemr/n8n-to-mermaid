@@ -20,7 +20,7 @@ def build_parser() -> argparse.ArgumentParser:
         "-o", "--output", type=Path, help="Write Mermaid to this file instead of stdout."
     )
     parser.add_argument(
-        "--direction", choices=sorted(VALID_DIRECTIONS), default="TD", help="Flowchart direction."
+        "--direction", choices=sorted(VALID_DIRECTIONS), default="LR", help="Flowchart direction."
     )
     parser.add_argument("--title", help="Optional diagram title, stored as a Mermaid comment.")
     parser.add_argument(

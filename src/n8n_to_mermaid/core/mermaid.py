@@ -8,7 +8,7 @@ VALID_DIRECTIONS = frozenset({"TB", "TD", "BT", "RL", "LR"})
 
 
 def render_mermaid(
-    graph: WorkflowGraph, *, direction: str = "TD", title: str | None = None
+    graph: WorkflowGraph, *, direction: str = "LR", title: str | None = None
 ) -> str:
     """Bir :class:`WorkflowGraph`ı Mermaid ``flowchart`` sözdizimine çevirir."""
     if direction not in VALID_DIRECTIONS:

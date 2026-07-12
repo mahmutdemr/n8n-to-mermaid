@@ -25,7 +25,7 @@ class ConvertWorkflowTests(unittest.TestCase):
     def test_converts_nodes_connections_and_disabled_style(self) -> None:
         result = convert_workflow(WORKFLOW)
 
-        self.assertIn("flowchart TD", result)
+        self.assertIn("flowchart LR", result)
         self.assertIn('n1["Webhook\\nwebhook"]', result)
         self.assertIn("n1 --> n2", result)
         self.assertIn("n2 --> n3", result)
@@ -55,3 +55,21 @@ class ConvertWorkflowTests(unittest.TestCase):
         self.assertEqual(graph.edges[0].target_id, "n2")
         self.assertEqual(graph.edges[1].source_id, "n2")
         self.assertEqual(graph.edges[1].target_id, "n1")
+
+    def test_omits_sticky_notes_and_their_connections(self) -> None:
+        workflow = {
+            "nodes": [
+                {"name": "Başlangıç", "type": "n8n-nodes-base.manualTrigger"},
+                {"name": "Not", "type": "n8n-nodes-base.stickyNote"},
+                {"name": "Bitiş", "type": "n8n-nodes-base.set"},
+            ],
+            "connections": {
+                "Başlangıç": {"main": [[{"node": "Bitiş"}]]},
+                "Not": {"main": [[{"node": "Bitiş"}]]},
+            },
+        }
+
+        result = convert_workflow(workflow)
+
+        self.assertNotIn("Not", result)
+        self.assertIn("n1 --> n2", result)

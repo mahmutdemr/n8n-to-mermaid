@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="n8n workflow JSON dosyalarını tarayıcınızda Mermaid diyagramlarına dönüştürün."
+    />
+    <title>n8n to Mermaid</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="./" aria-label="n8n to Mermaid ana sayfa">n8n <span>→</span> Mermaid</a>
+        <p>Workflow JSON’unu tarayıcınızda diyagrama dönüştürün.</p>
+      </header>
+
+      <nav class="steps" aria-label="Dönüşüm adımları">
+        <span id="source-step-label" class="step-label is-active">1. JSON al</span>
+        <span aria-hidden="true">—</span>
+        <span id="result-step-label" class="step-label">2. Mermaid görüntüle</span>
+      </nav>
+
+      <section id="input-step" class="step-screen" aria-labelledby="input-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">1. Kaynak</p>
+            <h1 id="input-heading">n8n workflow JSON</h1>
+          </div>
+        </div>
+        <p class="intro">Workflow JSON’unu yapıştırın veya dışa aktarılan dosyayı yükleyin.</p>
+
+          <label class="sr-only" for="workflow-json">Workflow JSON</label>
+          <textarea
+            id="workflow-json"
+            spellcheck="false"
+            placeholder='n8n workflow JSON’unu buraya yapıştırın…'
+          ></textarea>
+
+          <div id="drop-zone" class="drop-zone" role="button" tabindex="0" aria-describedby="file-help">
+            <input id="workflow-file" type="file" accept="application/json,.json" hidden />
+            <strong>JSON dosyasını sürükleyin</strong>
+            <span id="file-help">veya seçmek için tıklayın</span>
+          </div>
+
+        <div class="actions">
+          <button id="convert-button" class="button button-primary" type="button">Mermaid oluştur</button>
+          <button id="clear-button" class="button button-secondary" type="button">Temizle</button>
+        </div>
+        <p id="input-status" class="status" role="status" aria-live="polite"></p>
+      </section>
+
+      <section id="result-step" class="step-screen" aria-labelledby="output-heading" hidden>
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">2. Sonuç</p>
+              <h2 id="output-heading">Mermaid diyagramı</h2>
+            </div>
+            <div class="result-actions">
+              <label class="select-label" for="direction">
+                Yön
+                <select id="direction" name="direction">
+                  <option value="LR" selected>Soldan sağa</option>
+                  <option value="TD">Yukarıdan aşağı</option>
+                  <option value="BT">Aşağıdan yukarı</option>
+                  <option value="RL">Sağdan sola</option>
+                </select>
+              </label>
+              <button id="download-button" class="button button-primary" type="button" disabled>
+                .mmd indir
+              </button>
+              <button id="edit-button" class="button button-secondary" type="button">JSON’u düzenle</button>
+            </div>
+          </div>
+
+          <div id="diagram" class="diagram" aria-live="polite"></div>
+          <details id="source-details" class="source-details" hidden>
+            <summary>Mermaid metnini göster</summary>
+            <pre><code id="mermaid-source"></code></pre>
+          </details>
+      </section>
+
+      <footer>Dosyanız tarayıcınızdan ayrılmaz; herhangi bir sunucuya yüklenmez.</footer>
+    </main>
+    <script type="module" src="assets/app.js"></script>
+  </body>
+</html>

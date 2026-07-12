@@ -13,7 +13,7 @@ from .core import VALID_DIRECTIONS, render_mermaid, workflow_to_graph
 class ConversionOptions:
     """Üretilen Mermaid diyagramını etkileyen seçenekler."""
 
-    direction: str = "TD"
+    direction: str = "LR"
     title: str | None = None
     include_disabled: bool = True
 

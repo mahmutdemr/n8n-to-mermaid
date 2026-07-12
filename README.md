@@ -36,6 +36,20 @@ uv run n8n-to-mermaid workflow.json --output workflow.mmd --direction LR
 Paste the resulting Mermaid text into a Mermaid-compatible Markdown renderer,
 such as GitHub or the Mermaid Live Editor.
 
+## Web interface
+
+The static browser interface accepts pasted JSON and `.json` files, renders the
+result locally, and downloads a `.mmd` file. No workflow data is uploaded.
+
+Run it locally:
+
+```bash
+python3 -m http.server 8000 --directory apps/web
+```
+
+Then open <http://localhost:8000>. The GitHub Pages workflow deploys this same
+directory after it is enabled in repository settings.
+
 ## Docker
 
 Build the image, then mount a directory containing your n8n export:
@@ -56,6 +70,7 @@ docker run --rm -v "$PWD:/work:ro" n8n-to-mermaid /work/workflow.json > workflow
 ```text
 src/n8n_to_mermaid/core/  Domain graph, n8n parser, Mermaid renderer
 src/n8n_to_mermaid/       CLI adapter and public Python API
+apps/web/                 Static browser interface; no build dependency
 examples/input/           Safe n8n workflow fixtures
 examples/output/          Expected Mermaid output for those fixtures
 .workspace/               Private developer/agent notes (ignored except its guide)
@@ -69,6 +84,7 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a change.
 uv sync --all-groups
 uv run ruff check .
 uv run python -m unittest discover -s tests -v
+(cd apps/web && npm test)
 ```
 
 ## Roadmap
