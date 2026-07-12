@@ -1,0 +1,11 @@
+name: n8n-to-mermaid
+
+services:
+  web:
+    build:
+      context: .
+    image: n8n-to-mermaid:local
+    container_name: n8n-to-mermaid
+    ports:
+      - "${N8N_TO_MERMAID_PORT:-8080}:8080"
+    restart: unless-stopped

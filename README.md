@@ -3,12 +3,10 @@
 Convert n8n workflow exports into readable Mermaid flowcharts.
 
 `n8n-to-mermaid` is intentionally built around a small, interface-independent
-Python core. The same graph model can serve a terminal command today and a
-static browser experience later, without putting UI concerns in the conversion
-logic.
+Python core. The same graph model supports both a terminal command and a static
+browser experience without putting UI concerns in the conversion logic.
 
-> **Project status:** early development. The CLI is usable; the static browser
-> UI is planned work.
+> **Project status:** early development. The CLI and static browser UI are usable.
 
 ## What it does
 
@@ -52,17 +50,46 @@ directory after it is enabled in repository settings.
 
 ## Docker
 
-Build the image, then mount a directory containing your n8n export:
+### Web application
+
+With [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed,
+start the browser application from the repository root:
+
+```bash
+docker compose up -d --build
+```
+
+Open <http://localhost:8080>. The workflow is still processed entirely in the
+browser; the container only serves the static application files.
+
+After the first build, manage the application with:
+
+```bash
+docker compose stop
+docker compose start
+```
+
+To remove the stopped container, run `docker compose down`. To use a different
+host port, set `N8N_TO_MERMAID_PORT` before starting, for example:
+
+```bash
+N8N_TO_MERMAID_PORT=8787 docker compose up -d --build
+```
+
+### Command line
+
+The same image also retains the CLI. Build the image, then mount a directory
+containing your n8n export:
 
 ```bash
 docker build -t n8n-to-mermaid .
-docker run --rm -v "$PWD:/work:ro" n8n-to-mermaid /work/workflow.json
+docker run --rm --entrypoint n8n-to-mermaid -v "$PWD:/work:ro" n8n-to-mermaid /work/workflow.json
 ```
 
 To save the result, redirect stdout on the host:
 
 ```bash
-docker run --rm -v "$PWD:/work:ro" n8n-to-mermaid /work/workflow.json > workflow.mmd
+docker run --rm --entrypoint n8n-to-mermaid -v "$PWD:/work:ro" n8n-to-mermaid /work/workflow.json > workflow.mmd
 ```
 
 ## Project layout

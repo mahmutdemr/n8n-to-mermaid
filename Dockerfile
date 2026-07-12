@@ -9,6 +9,8 @@ FROM python:3.13-slim
 
 RUN useradd --create-home --uid 10001 appuser
 COPY --from=builder /usr/local /usr/local
+COPY apps/web /app/web
 USER appuser
 WORKDIR /work
-ENTRYPOINT ["n8n-to-mermaid"]
+EXPOSE 8080
+CMD ["python", "-m", "http.server", "8080", "--directory", "/app/web"]
