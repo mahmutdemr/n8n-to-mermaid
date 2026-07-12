@@ -50,7 +50,26 @@ directory after it is enabled in repository settings.
 
 ## Docker
 
-### Web application
+### Run a published image
+
+Download and start the application without cloning this repository:
+
+```bash
+docker run -d --name n8n-to-mermaid --restart unless-stopped -p 8080:8080 ghcr.io/<github-owner>/<repository-name>:latest
+```
+
+Open <http://localhost:8080>. Use the image name displayed on the repository's
+GitHub Packages page in place of the placeholder above. Stop or start the
+application at any time with:
+
+```bash
+docker stop n8n-to-mermaid
+docker start n8n-to-mermaid
+```
+
+Use a versioned tag such as `:v1.0.0` when you need a repeatable deployment.
+
+### Build from source
 
 With [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed,
 start the browser application from the repository root:
