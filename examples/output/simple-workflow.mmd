@@ -1,18 +1,22 @@
 flowchart LR
+    subgraph rag_group_1["RAG retrieval: Get top chunks matching query"]
+        n8["Embeddings OpenAI2\nembeddingsOpenAi"]
+        n12["Get top chunks matching query\nvectorStorePinecone"]
+    end
+    subgraph generation_group_1["AI generation: Answer the query based on chunks"]
+        n4["OpenAI Chat Model1\nlmChatOpenAi"]
+        n14["Answer the query based on chunks\ninformationExtractor"]
+    end
     n1["When clicking &quot;Execute Workflow&quot;\nmanualTrigger"]
     n2["Pinecone Vector Store\nvectorStorePinecone"]
     n3["When chat message received\nchatTrigger"]
-    n4["OpenAI Chat Model1\nlmChatOpenAi"]
     n5["Set file URL in Google Drive\nset"]
     n6["Download file\ngoogleDrive"]
     n7["Default Data Loader\ndocumentDefaultDataLoader"]
-    n8["Embeddings OpenAI2\nembeddingsOpenAi"]
     n9["Embeddings OpenAI\nembeddingsOpenAi"]
     n10["Recursive Character Text Splitter\ntextSplitterRecursiveCharacterTextSplitter"]
     n11["Set max chunks to send to model\nset"]
-    n12["Get top chunks matching query\nvectorStorePinecone"]
     n13["Prepare chunks\ncode"]
-    n14["Answer the query based on chunks\ninformationExtractor"]
     n15["Compose citations\nset"]
     n16["Generate response\nset"]
     n6 --> n2

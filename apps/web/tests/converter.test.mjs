@@ -38,3 +38,51 @@ test("browser converter omits sticky notes", () => {
   assert.doesNotMatch(result, /Not/);
   assert.match(result, /n1 --> n2/);
 });
+
+test("browser converter groups an agent and its AI subnodes", () => {
+  const workflow = {
+    nodes: [
+      { name: "Girdi", type: "n8n-nodes-base.manualTrigger" },
+      { name: "Destek Asistanı", type: "@n8n/n8n-nodes-langchain.agent" },
+      { name: "Chat Model", type: "@n8n/n8n-nodes-langchain.lmChatOpenAi" },
+      { name: "Hafıza", type: "@n8n/n8n-nodes-langchain.memoryBufferWindow" },
+      { name: "Yanıt", type: "n8n-nodes-base.set" },
+    ],
+    connections: {
+      Girdi: { main: [[{ node: "Destek Asistanı" }]] },
+      "Chat Model": { ai_languageModel: [[{ node: "Destek Asistanı" }]] },
+      Hafıza: { ai_memory: [[{ node: "Destek Asistanı" }]] },
+      "Destek Asistanı": { main: [[{ node: "Yanıt" }]] },
+    },
+  };
+
+  const result = convertWorkflow(workflow);
+
+  assert.match(result, /subgraph agent_group_1\["Agent: Destek Asistanı"\]/);
+  assert.match(result, /n1 --> n2/);
+  assert.match(result, /n2 --> n5/);
+});
+
+test("browser converter groups RAG retrieval and AI generation", () => {
+  const workflow = {
+    nodes: [
+      {
+        name: "Retriever",
+        type: "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+        parameters: { mode: "load" },
+      },
+      { name: "Embeddings", type: "@n8n/n8n-nodes-langchain.embeddingsOpenAi" },
+      { name: "Yanıtla", type: "@n8n/n8n-nodes-langchain.informationExtractor" },
+      { name: "Chat Model", type: "@n8n/n8n-nodes-langchain.lmChatOpenAi" },
+    ],
+    connections: {
+      Embeddings: { ai_embedding: [[{ node: "Retriever" }]] },
+      "Chat Model": { ai_languageModel: [[{ node: "Yanıtla" }]] },
+    },
+  };
+
+  const result = convertWorkflow(workflow);
+
+  assert.match(result, /subgraph rag_group_1\["RAG retrieval: Retriever"\]/);
+  assert.match(result, /subgraph generation_group_1\["AI generation: Yanıtla"\]/);
+});

@@ -73,3 +73,60 @@ class ConvertWorkflowTests(unittest.TestCase):
 
         self.assertNotIn("Not", result)
         self.assertIn("n1 --> n2", result)
+
+    def test_groups_an_agent_with_its_ai_subnodes(self) -> None:
+        workflow = {
+            "nodes": [
+                {"name": "Girdi", "type": "n8n-nodes-base.manualTrigger"},
+                {"name": "Destek Asistanı", "type": "@n8n/n8n-nodes-langchain.agent"},
+                {"name": "Chat Model", "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi"},
+                {"name": "Hafıza", "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow"},
+                {"name": "Yanıt", "type": "n8n-nodes-base.set"},
+            ],
+            "connections": {
+                "Girdi": {"main": [[{"node": "Destek Asistanı"}]]},
+                "Chat Model": {"ai_languageModel": [[{"node": "Destek Asistanı"}]]},
+                "Hafıza": {"ai_memory": [[{"node": "Destek Asistanı"}]]},
+                "Destek Asistanı": {"main": [[{"node": "Yanıt"}]]},
+            },
+        }
+
+        graph = workflow_to_graph(workflow)
+        result = convert_workflow(workflow)
+
+        self.assertEqual(len(graph.groups), 1)
+        self.assertEqual(graph.groups[0].node_ids, ("n2", "n3", "n4"))
+        self.assertIn('subgraph agent_group_1["Agent: Destek Asistanı"]', result)
+        self.assertIn("n1 --> n2", result)
+        self.assertIn("n2 --> n5", result)
+
+    def test_groups_rag_retriever_and_ai_generation(self) -> None:
+        workflow = {
+            "nodes": [
+                {
+                    "name": "Retriever",
+                    "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+                    "parameters": {"mode": "load"},
+                },
+                {"name": "Embeddings", "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi"},
+                {
+                    "name": "Yanıtla",
+                    "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+                },
+                {"name": "Chat Model", "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi"},
+            ],
+            "connections": {
+                "Embeddings": {"ai_embedding": [[{"node": "Retriever"}]]},
+                "Chat Model": {"ai_languageModel": [[{"node": "Yanıtla"}]]},
+            },
+        }
+
+        graph = workflow_to_graph(workflow)
+        result = convert_workflow(workflow)
+
+        self.assertEqual(
+            [group.label for group in graph.groups],
+            ["RAG retrieval: Retriever", "AI generation: Yanıtla"],
+        )
+        self.assertIn('subgraph rag_group_1["RAG retrieval: Retriever"]', result)
+        self.assertIn('subgraph generation_group_1["AI generation: Yanıtla"]', result)

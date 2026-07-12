@@ -13,11 +13,27 @@ class Node:
     name: str
     type: str
     disabled: bool = False
+    mode: str | None = None
 
     @property
     def is_trigger(self) -> bool:
         """n8n node type adına göre trigger node'unu belirler."""
         return self.type.endswith("Trigger")
+
+    @property
+    def is_agent(self) -> bool:
+        """n8n AI Agent node'unu type adına göre belirler."""
+        return self.type == "@n8n/n8n-nodes-langchain.agent"
+
+    @property
+    def is_rag_retriever(self) -> bool:
+        """RAG sorgularında veri yükleyen Vector Store node'unu belirler."""
+        return self.mode == "load" and "vectorStore" in self.type
+
+    @property
+    def is_ai_generator(self) -> bool:
+        """Yanıt üretimini yapan yerleşik AI chain node'unu belirler."""
+        return self.type.endswith(".informationExtractor")
 
 
 @dataclass(frozen=True)
@@ -38,9 +54,19 @@ class Edge:
 
 
 @dataclass(frozen=True)
+class Group:
+    """Renderer'ın bir Mermaid ``subgraph`` olarak sunacağı node grubu."""
+
+    id: str
+    label: str
+    node_ids: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class WorkflowGraph:
     """n8n'e ya da herhangi bir render hedefine bağlı olmayan workflow grafı."""
 
     name: str | None
     nodes: tuple[Node, ...]
     edges: tuple[Edge, ...]
+    groups: tuple[Group, ...] = ()

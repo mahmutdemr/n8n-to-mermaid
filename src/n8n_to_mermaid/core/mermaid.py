@@ -20,8 +20,17 @@ def render_mermaid(
     if diagram_title:
         lines.append(f"    %% {diagram_title}")
 
+    nodes_by_id = {node.id: node for node in graph.nodes}
+    grouped_node_ids = {node_id for group in graph.groups for node_id in group.node_ids}
+    for group in graph.groups:
+        lines.append(f'    subgraph {group.id}["{_escape_label(group.label)}"]')
+        for node_id in group.node_ids:
+            node = nodes_by_id[node_id]
+            lines.append(f'        {node.id}["{_escape_label(_node_label(node.name, node.type))}"]')
+        lines.append("    end")
     for node in graph.nodes:
-        lines.append(f'    {node.id}["{_escape_label(_node_label(node.name, node.type))}"]')
+        if node.id not in grouped_node_ids:
+            lines.append(f'    {node.id}["{_escape_label(_node_label(node.name, node.type))}"]')
     for edge in graph.edges:
         connector = f" -->|{edge.label}| " if edge.label else " --> "
         lines.append(f"    {edge.source_id}{connector}{edge.target_id}")
