@@ -15,6 +15,7 @@ const dropZone = document.querySelector("#drop-zone");
 const direction = document.querySelector("#direction");
 const convertButton = document.querySelector("#convert-button");
 const clearButton = document.querySelector("#clear-button");
+const exampleButton = document.querySelector("#example-button");
 const downloadButton = document.querySelector("#download-button");
 const editButton = document.querySelector("#edit-button");
 const status = document.querySelector("#input-status");
@@ -31,6 +32,7 @@ let outputName = "workflow.mmd";
 
 convertButton.addEventListener("click", renderWorkflow);
 clearButton.addEventListener("click", clearWorkspace);
+exampleButton.addEventListener("click", loadExample);
 downloadButton.addEventListener("click", downloadMermaid);
 editButton.addEventListener("click", showInputStep);
 direction.addEventListener("change", renderWorkflow);
@@ -63,6 +65,10 @@ async function loadFile(file) {
     setStatus("Lütfen bir .json workflow dosyası seçin.", true);
     return;
   }
+  if (file.size > 10 * 1024 * 1024) {
+    setStatus("Dosya 10 MB sınırını aşıyor. Daha küçük bir workflow seçin.", true);
+    return;
+  }
   try {
     textarea.value = await file.text();
     outputName = `${file.name.replace(/\.json$/i, "") || "workflow"}.mmd`;
@@ -79,6 +85,7 @@ async function renderWorkflow() {
     return;
   }
   try {
+    setConvertLoading(true);
     const workflow = JSON.parse(source);
     generatedMermaid = convertWorkflow(workflow, { direction: direction.value });
     outputName = outputName === "workflow.mmd" ? fileNameFor(workflow) : outputName;
@@ -96,6 +103,8 @@ async function renderWorkflow() {
     diagram.replaceChildren();
     sourceDetails.hidden = true;
     setStatus(error instanceof Error ? error.message : "Diyagram oluşturulamadı.", true);
+  } finally {
+    setConvertLoading(false);
   }
 }
 
@@ -108,6 +117,28 @@ function clearWorkspace() {
   sourceDetails.hidden = true;
   downloadButton.disabled = true;
   setStatus("");
+  textarea.focus();
+}
+
+function loadExample() {
+  textarea.value = JSON.stringify(
+    {
+      name: "Yeni müşteri karşılama",
+      nodes: [
+        { name: "Form gönderildi", type: "n8n-nodes-base.formTrigger" },
+        { name: "Müşteri oluştur", type: "n8n-nodes-base.hubspot" },
+        { name: "Hoş geldin e-postası", type: "n8n-nodes-base.gmail" },
+      ],
+      connections: {
+        "Form gönderildi": { main: [[{ node: "Müşteri oluştur" }]] },
+        "Müşteri oluştur": { main: [[{ node: "Hoş geldin e-postası" }]] },
+      },
+    },
+    null,
+    2,
+  );
+  outputName = "yeni-musteri-karsilama.mmd";
+  setStatus("Örnek workflow eklendi. Diyagram oluşturabilirsiniz.");
   textarea.focus();
 }
 
@@ -146,4 +177,11 @@ function fileNameFor(workflow) {
 function setStatus(message, isError = false) {
   status.textContent = message;
   status.classList.toggle("is-error", isError);
+}
+
+function setConvertLoading(isLoading) {
+  convertButton.disabled = isLoading;
+  convertButton.innerHTML = isLoading
+    ? "Diyagram oluşturuluyor…"
+    : 'Diyagram oluştur <span aria-hidden="true">→</span>';
 }
