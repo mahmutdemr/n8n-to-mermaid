@@ -1,0 +1,48 @@
+[project]
+name = "n8n-to-mermaid"
+version = "0.1.0"
+description = "Convert n8n workflow exports into portable graphs and Mermaid flowcharts."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "n8n-to-mermaid contributors" }]
+keywords = ["n8n", "mermaid", "workflow", "visualization"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Documentation",
+]
+
+[project.scripts]
+n8n-to-mermaid = "n8n_to_mermaid.cli:main"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.12.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["n8n_to_mermaid"]
+
+[tool.coverage.run]
+branch = true
+source = ["n8n_to_mermaid"]
+
+[tool.coverage.report]
+show_missing = true

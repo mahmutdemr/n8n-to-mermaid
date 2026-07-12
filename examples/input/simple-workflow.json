@@ -1,0 +1,28 @@
+{
+  "name": "Örnek webhook akışı",
+  "nodes": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "name": "Veriyi dönüştür",
+      "type": "n8n-nodes-base.set",
+      "parameters": {}
+    },
+    {
+      "name": "E-posta gönder",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{"node": "Veriyi dönüştür", "type": "main", "index": 0}]]
+    },
+    "Veriyi dönüştür": {
+      "main": [[{"node": "E-posta gönder", "type": "main", "index": 0}]]
+    }
+  }
+}

@@ -1,0 +1,51 @@
+# =============================================
+# Environment & secrets
+# =============================================
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Private workspace notes (developer and agent working memory)
+.workspace/*
+!.workspace/README.md
+
+# =============================================
+# IDE
+# =============================================
+.idea/
+*.swp
+*.swo
+*~
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.claude
+
+# =============================================
+# OS
+# =============================================
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# =============================================
+# Python
+# =============================================
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/
+.coverage
+coverage.xml
+htmlcov/
+
+
+# =============================================
+# Workspace
+# =============================================
+.workspace/
