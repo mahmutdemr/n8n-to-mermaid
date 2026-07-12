@@ -2,16 +2,16 @@ const VALID_DIRECTIONS = new Set(["TB", "TD", "BT", "RL", "LR"]);
 
 export function convertWorkflow(workflow, { direction = "LR" } = {}) {
   if (!VALID_DIRECTIONS.has(direction)) {
-    throw new Error(`Desteklenmeyen yön: ${direction}`);
+    throw new Error(`Unsupported flow direction: ${direction}`);
   }
   if (!Array.isArray(workflow?.nodes)) {
-    throw new Error("Geçersiz n8n workflow: 'nodes' bir liste olmalı.");
+    throw new Error("Invalid n8n workflow: 'nodes' must be a list.");
   }
   if (!workflow.nodes.every(isObject)) {
-    throw new Error("Geçersiz n8n workflow: her node bir nesne olmalı.");
+    throw new Error("Invalid n8n workflow: every node must be an object.");
   }
   if (!isObject(workflow.connections ?? {})) {
-    throw new Error("Geçersiz n8n workflow: 'connections' bir nesne olmalı.");
+    throw new Error("Invalid n8n workflow: 'connections' must be an object.");
   }
 
   const sourceNodes = workflow.nodes.filter((node) => !isStickyNote(node));
@@ -24,7 +24,7 @@ export function convertWorkflow(workflow, { direction = "LR" } = {}) {
   }));
   const identifiers = new Map(nodes.map((node) => [node.name, node.id]));
   if (identifiers.size !== nodes.length) {
-    throw new Error("Geçersiz n8n workflow: node adları benzersiz olmalı.");
+    throw new Error("Invalid n8n workflow: node names must be unique.");
   }
 
   const lines = [`flowchart ${direction}`];

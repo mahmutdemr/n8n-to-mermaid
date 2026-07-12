@@ -1,13 +1,10 @@
 <!doctype html>
-<html lang="tr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="n8n workflow JSON dosyalarını tarayıcınızda Mermaid diyagramlarına dönüştürün."
-    />
-    <title>n8n to Mermaid — Workflow görselleştirici</title>
+    <meta name="description" content="Turn n8n workflow JSON files into Mermaid diagrams directly in your browser." />
+    <title>n8n to Mermaid — Workflow visualizer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -16,34 +13,31 @@
   <body>
     <main class="page-shell">
       <header class="site-header">
-        <a class="brand" href="./" aria-label="n8n to Mermaid ana sayfa">
+        <a class="brand" href="./" aria-label="n8n to Mermaid home">
           <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
           <span>n8n <em>→</em> Mermaid</span>
         </a>
-        <p class="privacy-note"><span aria-hidden="true">⌁</span> Verileriniz yalnızca tarayıcınızda kalır</p>
+        <p class="privacy-note"><span aria-hidden="true">⌁</span> Your data stays in your browser</p>
       </header>
 
       <section class="hero" aria-labelledby="page-title">
-        <div>
-          <p class="eyebrow">Workflow görselleştirici</p>
-          <h1 id="page-title">Karmaşık akışları<br /><span>tek bakışta anlayın.</span></h1>
-        </div>
-        <p>n8n workflow JSON’unuzu okunabilir bir Mermaid diyagramına dönüştürün, düzenleyin ve paylaşın.</p>
+        <div><h1 id="page-title">Understand complex workflows<br /><span>at a glance.</span></h1></div>
+        <p>Turn your n8n workflow JSON into a clear Mermaid diagram that is easy to review and share.</p>
       </section>
 
-      <nav class="steps" aria-label="Dönüşüm adımları">
-        <span id="source-step-label" class="step-label is-active"><b>1</b> Workflow ekle</span>
+      <nav class="steps" aria-label="Conversion steps">
+        <span id="source-step-label" class="step-label is-active"><b>1</b> Add workflow</span>
         <span class="step-connector" aria-hidden="true"></span>
-        <span id="result-step-label" class="step-label"><b>2</b> Diyagramı incele</span>
+        <span id="result-step-label" class="step-label"><b>2</b> Review diagram</span>
       </nav>
 
       <section id="input-step" class="workspace input-workspace" aria-labelledby="input-heading">
         <div class="workspace-head">
           <div>
-            <p class="section-kicker">Kaynak dosya</p>
-            <h2 id="input-heading">Workflow JSON’unuzu ekleyin</h2>
+            <p class="section-kicker">Source file</p>
+            <h2 id="input-heading">Add your workflow JSON</h2>
           </div>
-          <button id="example-button" class="text-button" type="button">Örnek workflow’u dene <span aria-hidden="true">↗</span></button>
+          <button id="example-button" class="text-button" type="button">Try an example <span aria-hidden="true">↗</span></button>
         </div>
 
         <div class="input-grid">
@@ -60,19 +54,17 @@
           <div id="drop-zone" class="drop-zone" role="button" tabindex="0" aria-describedby="file-help">
             <input id="workflow-file" type="file" accept="application/json,.json" hidden />
             <span class="upload-icon" aria-hidden="true">↑</span>
-            <strong>JSON dosyanızı buraya bırakın</strong>
-            <span id="file-help">veya bilgisayarınızdan seçin</span>
-            <span class="file-type">.JSON · Maks. 10 MB</span>
+            <strong>Drop your JSON file here</strong>
+            <span id="file-help">or choose it from your computer</span>
+            <span class="file-type">.JSON · Max. 10 MB</span>
           </div>
         </div>
 
         <div class="workspace-footer">
           <p id="input-status" class="status" role="status" aria-live="polite"></p>
           <div class="actions">
-            <button id="clear-button" class="button button-ghost" type="button">Temizle</button>
-            <button id="convert-button" class="button button-primary" type="button">
-              Diyagram oluştur <span aria-hidden="true">→</span>
-            </button>
+            <button id="clear-button" class="button button-ghost" type="button">Clear</button>
+            <button id="convert-button" class="button button-primary" type="button">Create diagram <span aria-hidden="true">→</span></button>
           </div>
         </div>
       </section>
@@ -80,43 +72,47 @@
       <section id="result-step" class="workspace result-workspace" aria-labelledby="output-heading" hidden>
         <div class="result-head">
           <div>
-            <div class="ready-label"><span aria-hidden="true">✓</span> Dönüşüm tamamlandı</div>
-            <h2 id="output-heading">Mermaid diyagramınız hazır</h2>
+            <div class="ready-label"><span aria-hidden="true">✓</span> Conversion complete</div>
+            <h2 id="output-heading">Your Mermaid diagram is ready</h2>
           </div>
           <div class="result-actions">
-            <label class="select-label" for="direction">
-              <span>Akış yönü</span>
-              <select id="direction" name="direction">
-                <option value="LR" selected>Soldan sağa</option>
-                <option value="TD">Yukarıdan aşağı</option>
-                <option value="BT">Aşağıdan yukarı</option>
-                <option value="RL">Sağdan sola</option>
-              </select>
-            </label>
-            <button id="download-button" class="button button-primary" type="button" disabled>Mermaid indir <span aria-hidden="true">↓</span></button>
+            <div class="settings-wrap">
+              <button id="settings-button" class="button button-ghost settings-button" type="button" aria-expanded="false" aria-controls="settings-panel">
+                <span class="settings-icon" aria-hidden="true">⚙</span> Settings
+              </button>
+              <div id="settings-panel" class="settings-panel" hidden>
+                <p class="settings-title">Diagram settings</p>
+                <label class="select-label" for="direction">
+                  <span>Flow direction</span>
+                  <select id="direction" name="direction">
+                    <option value="LR" selected>Left to right</option>
+                    <option value="TD">Top to bottom</option>
+                    <option value="BT">Bottom to top</option>
+                    <option value="RL">Right to left</option>
+                  </select>
+                </label>
+                <p class="settings-hint">More display options will appear here.</p>
+              </div>
+            </div>
+            <button id="download-button" class="button button-primary" type="button" disabled>Download Mermaid <span aria-hidden="true">↓</span></button>
           </div>
         </div>
 
         <div class="diagram-frame">
-          <div class="diagram-canvas">
-            <div id="diagram" class="diagram" aria-live="polite"></div>
-          </div>
-          <div class="diagram-caption"><span><i></i> Diyagram önizlemesi</span><span>Kaydırarak tüm akışı görüntüleyin</span></div>
+          <div class="diagram-canvas"><div id="diagram" class="diagram" aria-live="polite"></div></div>
+          <div class="diagram-caption"><span><i></i> Diagram preview</span><span>Scroll to view the full workflow</span></div>
         </div>
 
         <div class="result-footer">
-          <button id="edit-button" class="button button-ghost" type="button">← JSON’u düzenle</button>
+          <button id="edit-button" class="button button-ghost" type="button">← Edit JSON</button>
           <details id="source-details" class="source-details" hidden>
-            <summary>Mermaid kodunu görüntüle <span aria-hidden="true">⌄</span></summary>
+            <summary>View Mermaid code <span aria-hidden="true">⌄</span></summary>
             <pre><code id="mermaid-source"></code></pre>
           </details>
         </div>
       </section>
 
-      <footer>
-        <span class="footer-mark" aria-hidden="true">✦</span>
-        Dosyalarınız işlenmek üzere hiçbir sunucuya gönderilmez.
-      </footer>
+      <footer><span class="footer-mark" aria-hidden="true">✦</span> Your files are never sent to a server for processing.</footer>
     </main>
     <script type="module" src="assets/app.js"></script>
   </body>

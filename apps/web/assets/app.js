@@ -16,6 +16,8 @@ const direction = document.querySelector("#direction");
 const convertButton = document.querySelector("#convert-button");
 const clearButton = document.querySelector("#clear-button");
 const exampleButton = document.querySelector("#example-button");
+const settingsButton = document.querySelector("#settings-button");
+const settingsPanel = document.querySelector("#settings-panel");
 const downloadButton = document.querySelector("#download-button");
 const editButton = document.querySelector("#edit-button");
 const status = document.querySelector("#input-status");
@@ -33,9 +35,19 @@ let outputName = "workflow.mmd";
 convertButton.addEventListener("click", renderWorkflow);
 clearButton.addEventListener("click", clearWorkspace);
 exampleButton.addEventListener("click", loadExample);
+settingsButton.addEventListener("click", toggleSettings);
 downloadButton.addEventListener("click", downloadMermaid);
 editButton.addEventListener("click", showInputStep);
-direction.addEventListener("change", renderWorkflow);
+direction.addEventListener("change", () => {
+  closeSettings();
+  renderWorkflow();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeSettings();
+});
+document.addEventListener("click", (event) => {
+  if (!event.target.closest(".settings-wrap")) closeSettings();
+});
 fileInput.addEventListener("change", () => loadFile(fileInput.files?.[0]));
 dropZone.addEventListener("click", () => fileInput.click());
 dropZone.addEventListener("keydown", (event) => {
@@ -62,26 +74,26 @@ dropZone.addEventListener("drop", (event) => loadFile(event.dataTransfer.files?.
 async function loadFile(file) {
   if (!file) return;
   if (!file.name.toLowerCase().endsWith(".json") && file.type !== "application/json") {
-    setStatus("Lütfen bir .json workflow dosyası seçin.", true);
+    setStatus("Please choose an n8n workflow .json file.", true);
     return;
   }
   if (file.size > 10 * 1024 * 1024) {
-    setStatus("Dosya 10 MB sınırını aşıyor. Daha küçük bir workflow seçin.", true);
+    setStatus("This file is over the 10 MB limit. Choose a smaller workflow.", true);
     return;
   }
   try {
     textarea.value = await file.text();
     outputName = `${file.name.replace(/\.json$/i, "") || "workflow"}.mmd`;
-    setStatus(`${file.name} yüklendi.`);
+    setStatus(`${file.name} loaded.`);
   } catch {
-    setStatus("Dosya okunamadı.", true);
+    setStatus("The file could not be read.", true);
   }
 }
 
 async function renderWorkflow() {
   const source = textarea.value.trim();
   if (!source) {
-    setStatus("Önce n8n workflow JSON’unu yapıştırın veya bir dosya yükleyin.", true);
+    setStatus("Paste your n8n workflow JSON or upload a file first.", true);
     return;
   }
   try {
@@ -95,14 +107,14 @@ async function renderWorkflow() {
     sourceDetails.hidden = false;
     mermaidSource.textContent = generatedMermaid;
     downloadButton.disabled = false;
-    setStatus("Diyagram hazır.");
+    setStatus("Diagram ready.");
     showResultStep();
   } catch (error) {
     generatedMermaid = "";
     downloadButton.disabled = true;
     diagram.replaceChildren();
     sourceDetails.hidden = true;
-    setStatus(error instanceof Error ? error.message : "Diyagram oluşturulamadı.", true);
+    setStatus(error instanceof Error ? error.message : "The diagram could not be created.", true);
   } finally {
     setConvertLoading(false);
   }
@@ -123,22 +135,22 @@ function clearWorkspace() {
 function loadExample() {
   textarea.value = JSON.stringify(
     {
-      name: "Yeni müşteri karşılama",
+      name: "New customer welcome",
       nodes: [
-        { name: "Form gönderildi", type: "n8n-nodes-base.formTrigger" },
-        { name: "Müşteri oluştur", type: "n8n-nodes-base.hubspot" },
-        { name: "Hoş geldin e-postası", type: "n8n-nodes-base.gmail" },
+        { name: "Form submitted", type: "n8n-nodes-base.formTrigger" },
+        { name: "Create contact", type: "n8n-nodes-base.hubspot" },
+        { name: "Welcome email", type: "n8n-nodes-base.gmail" },
       ],
       connections: {
-        "Form gönderildi": { main: [[{ node: "Müşteri oluştur" }]] },
-        "Müşteri oluştur": { main: [[{ node: "Hoş geldin e-postası" }]] },
+        "Form submitted": { main: [[{ node: "Create contact" }]] },
+        "Create contact": { main: [[{ node: "Welcome email" }]] },
       },
     },
     null,
     2,
   );
-  outputName = "yeni-musteri-karsilama.mmd";
-  setStatus("Örnek workflow eklendi. Diyagram oluşturabilirsiniz.");
+  outputName = "new-customer-welcome.mmd";
+  setStatus("Example workflow added. You can create the diagram now.");
   textarea.focus();
 }
 
@@ -182,6 +194,18 @@ function setStatus(message, isError = false) {
 function setConvertLoading(isLoading) {
   convertButton.disabled = isLoading;
   convertButton.innerHTML = isLoading
-    ? "Diyagram oluşturuluyor…"
-    : 'Diyagram oluştur <span aria-hidden="true">→</span>';
+    ? "Creating diagram…"
+    : 'Create diagram <span aria-hidden="true">→</span>';
+}
+
+function toggleSettings() {
+  const isOpen = !settingsPanel.hidden;
+  settingsPanel.hidden = isOpen;
+  settingsButton.setAttribute("aria-expanded", String(!isOpen));
+}
+
+function closeSettings() {
+  if (settingsPanel.hidden) return;
+  settingsPanel.hidden = true;
+  settingsButton.setAttribute("aria-expanded", "false");
 }
