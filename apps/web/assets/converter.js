@@ -60,13 +60,15 @@ export function convertWorkflow(workflow, { direction = "LR" } = {}) {
     lines.push(`    subgraph ${group.id}["${escapeLabel(group.label)}"]`);
     for (const nodeId of group.nodeIds) {
       const node = nodesById.get(nodeId);
-      lines.push(`        ${node.id}["${escapeLabel(nodeLabel(node.name, node.type))}"]`);
+      lines.push(`        %% type: ${shortNodeType(node.type)}`);
+      lines.push(`        ${node.id}["${escapeLabel(node.name)}"]`);
     }
     lines.push("    end");
   }
   for (const node of nodes) {
     if (!groupedNodeIds.has(node.id)) {
-      lines.push(`    ${node.id}["${escapeLabel(nodeLabel(node.name, node.type))}"]`);
+      lines.push(`    %% type: ${shortNodeType(node.type)}`);
+      lines.push(`    ${node.id}["${escapeLabel(node.name)}"]`);
     }
   }
   for (const edge of edges) {
@@ -171,15 +173,14 @@ function isAiGenerator(node) {
   return node.type.endsWith(".informationExtractor");
 }
 
-function nodeLabel(name, nodeType) {
-  const shortType = nodeType.split(".").at(-1);
-  return shortType ? `${name}\\n${shortType}` : name;
-}
-
 function edgeLabel(kind, outputIndex) {
   return kind === "main" ? (outputIndex === 0 ? "" : `output ${outputIndex + 1}`) : kind;
 }
 
 function escapeLabel(value) {
   return value.replaceAll("&", "&amp;").replaceAll('"', "&quot;");
+}
+
+function shortNodeType(value) {
+  return value.replaceAll(/\r?\n/g, " ").split(".").at(-1);
 }

@@ -26,11 +26,13 @@ def render_mermaid(
         lines.append(f'    subgraph {group.id}["{_escape_label(group.label)}"]')
         for node_id in group.node_ids:
             node = nodes_by_id[node_id]
-            lines.append(f'        {node.id}["{_escape_label(_node_label(node.name, node.type))}"]')
+            lines.append(f"        %% type: {_node_type_label(node.type)}")
+            lines.append(f'        {node.id}["{_escape_label(node.name)}"]')
         lines.append("    end")
     for node in graph.nodes:
         if node.id not in grouped_node_ids:
-            lines.append(f'    {node.id}["{_escape_label(_node_label(node.name, node.type))}"]')
+            lines.append(f"    %% type: {_node_type_label(node.type)}")
+            lines.append(f'    {node.id}["{_escape_label(node.name)}"]')
     for edge in graph.edges:
         connector = f" -->|{edge.label}| " if edge.label else " --> "
         lines.append(f"    {edge.source_id}{connector}{edge.target_id}")
@@ -48,10 +50,15 @@ def render_mermaid(
     return "\n".join(lines) + "\n"
 
 
-def _node_label(name: str, node_type: str) -> str:
-    short_type = node_type.rsplit(".", maxsplit=1)[-1]
-    return f"{name}\\n{short_type}" if short_type else name
-
-
 def _escape_label(value: str) -> str:
     return value.replace("&", "&amp;").replace('"', "&quot;")
+
+
+def _comment_text(value: str) -> str:
+    """Mermaid yorumlarını tek satırda ve okunabilir tutar."""
+    return " ".join(value.splitlines())
+
+
+def _node_type_label(node_type: str) -> str:
+    """n8n node tipinin diyagram için kısa, okunabilir adını döndürür."""
+    return _comment_text(node_type).rsplit(".", maxsplit=1)[-1]

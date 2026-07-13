@@ -1,24 +1,40 @@
 flowchart LR
     subgraph rag_group_1["RAG retrieval: Get top chunks matching query"]
-        n8["Embeddings OpenAI2\nembeddingsOpenAi"]
-        n12["Get top chunks matching query\nvectorStorePinecone"]
+        %% type: embeddingsOpenAi
+        n8["Embeddings OpenAI2"]
+        %% type: vectorStorePinecone
+        n12["Get top chunks matching query"]
     end
     subgraph generation_group_1["AI generation: Answer the query based on chunks"]
-        n4["OpenAI Chat Model1\nlmChatOpenAi"]
-        n14["Answer the query based on chunks\ninformationExtractor"]
+        %% type: lmChatOpenAi
+        n4["OpenAI Chat Model1"]
+        %% type: informationExtractor
+        n14["Answer the query based on chunks"]
     end
-    n1["When clicking &quot;Execute Workflow&quot;\nmanualTrigger"]
-    n2["Pinecone Vector Store\nvectorStorePinecone"]
-    n3["When chat message received\nchatTrigger"]
-    n5["Set file URL in Google Drive\nset"]
-    n6["Download file\ngoogleDrive"]
-    n7["Default Data Loader\ndocumentDefaultDataLoader"]
-    n9["Embeddings OpenAI\nembeddingsOpenAi"]
-    n10["Recursive Character Text Splitter\ntextSplitterRecursiveCharacterTextSplitter"]
-    n11["Set max chunks to send to model\nset"]
-    n13["Prepare chunks\ncode"]
-    n15["Compose citations\nset"]
-    n16["Generate response\nset"]
+    %% type: manualTrigger
+    n1["When clicking &quot;Execute Workflow&quot;"]
+    %% type: vectorStorePinecone
+    n2["Pinecone Vector Store"]
+    %% type: chatTrigger
+    n3["When chat message received"]
+    %% type: set
+    n5["Set file URL in Google Drive"]
+    %% type: googleDrive
+    n6["Download file"]
+    %% type: documentDefaultDataLoader
+    n7["Default Data Loader"]
+    %% type: embeddingsOpenAi
+    n9["Embeddings OpenAI"]
+    %% type: textSplitterRecursiveCharacterTextSplitter
+    n10["Recursive Character Text Splitter"]
+    %% type: set
+    n11["Set max chunks to send to model"]
+    %% type: code
+    n13["Prepare chunks"]
+    %% type: set
+    n15["Compose citations"]
+    %% type: set
+    n16["Generate response"]
     n6 --> n2
     n13 --> n14
     n15 --> n16

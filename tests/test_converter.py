@@ -26,7 +26,8 @@ class ConvertWorkflowTests(unittest.TestCase):
         result = convert_workflow(WORKFLOW)
 
         self.assertIn("flowchart LR", result)
-        self.assertIn('n1["Webhook\\nwebhook"]', result)
+        self.assertIn('n1["Webhook"]', result)
+        self.assertIn("%% type: webhook", result)
         self.assertIn("n1 --> n2", result)
         self.assertIn("n2 --> n3", result)
         self.assertIn("n2 -->|output 2| n1", result)
