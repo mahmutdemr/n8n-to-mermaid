@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
     <meta name="description" content="Turn n8n workflow JSON files into Mermaid diagrams directly in your browser." />
     <title>n8n to Mermaid — Workflow visualizer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -17,7 +18,17 @@
           <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
           <span>n8n <em>→</em> Mermaid</span>
         </a>
-        <p class="privacy-note"><span aria-hidden="true">⌁</span> Your data stays in your browser</p>
+        <div class="header-actions">
+          <label class="theme-control" for="theme">
+            <span aria-hidden="true">◐</span>
+            <span class="sr-only">Color theme</span>
+            <select id="theme" name="theme" aria-label="Color theme">
+              <option value="system">System theme</option>
+              <option value="light">Light theme</option>
+              <option value="dark">Dark theme</option>
+            </select>
+          </label>
+        </div>
       </header>
 
       <nav class="steps" aria-label="Conversion steps">

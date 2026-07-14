@@ -2,17 +2,11 @@ import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.16.0/dist/mermaid.e
 
 import { convertWorkflow } from "./converter.js";
 
-mermaid.initialize({
-  startOnLoad: false,
-  securityLevel: "strict",
-  theme: "neutral",
-  flowchart: { htmlLabels: false, useMaxWidth: true },
-});
-
 const textarea = document.querySelector("#workflow-json");
 const fileInput = document.querySelector("#workflow-file");
 const dropZone = document.querySelector("#drop-zone");
 const direction = document.querySelector("#direction");
+const theme = document.querySelector("#theme");
 const convertButton = document.querySelector("#convert-button");
 const clearButton = document.querySelector("#clear-button");
 const exampleButton = document.querySelector("#example-button");
@@ -31,6 +25,9 @@ const resultStepLabel = document.querySelector("#result-step-label");
 
 let generatedMermaid = "";
 let outputName = "workflow.mmd";
+const colorScheme = window.matchMedia("(prefers-color-scheme: dark)");
+
+applyTheme(readThemePreference());
 
 convertButton.addEventListener("click", renderWorkflow);
 clearButton.addEventListener("click", clearWorkspace);
@@ -41,6 +38,16 @@ editButton.addEventListener("click", showInputStep);
 direction.addEventListener("change", () => {
   closeSettings();
   renderWorkflow();
+});
+theme.addEventListener("change", () => {
+  writeThemePreference(theme.value);
+  applyTheme(theme.value);
+  void renderGeneratedDiagram();
+});
+colorScheme.addEventListener("change", () => {
+  if (theme.value !== "system") return;
+  initializeMermaid();
+  void renderGeneratedDiagram();
 });
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") closeSettings();
@@ -101,9 +108,7 @@ async function renderWorkflow() {
     const workflow = JSON.parse(source);
     generatedMermaid = convertWorkflow(workflow, { direction: direction.value });
     outputName = outputName === "workflow.mmd" ? fileNameFor(workflow) : outputName;
-    const renderId = `workflow-${Date.now()}`;
-    const { svg } = await mermaid.render(renderId, generatedMermaid);
-    diagram.innerHTML = svg;
+    await renderGeneratedDiagram();
     sourceDetails.hidden = false;
     mermaidSource.textContent = generatedMermaid;
     downloadButton.disabled = false;
@@ -118,6 +123,13 @@ async function renderWorkflow() {
   } finally {
     setConvertLoading(false);
   }
+}
+
+async function renderGeneratedDiagram() {
+  if (!generatedMermaid) return;
+  const renderId = `workflow-${Date.now()}`;
+  const { svg } = await mermaid.render(renderId, generatedMermaid);
+  diagram.innerHTML = svg;
 }
 
 function clearWorkspace() {
@@ -208,4 +220,44 @@ function closeSettings() {
   if (settingsPanel.hidden) return;
   settingsPanel.hidden = true;
   settingsButton.setAttribute("aria-expanded", "false");
+}
+
+function readThemePreference() {
+  try {
+    const savedTheme = localStorage.getItem("n8n-to-mermaid-theme");
+    return ["system", "light", "dark"].includes(savedTheme) ? savedTheme : "system";
+  } catch {
+    return "system";
+  }
+}
+
+function writeThemePreference(value) {
+  try {
+    localStorage.setItem("n8n-to-mermaid-theme", value);
+  } catch {
+    // Theme selection still works when storage is unavailable.
+  }
+}
+
+function applyTheme(preference) {
+  theme.value = preference;
+  if (preference === "system") {
+    delete document.documentElement.dataset.theme;
+  } else {
+    document.documentElement.dataset.theme = preference;
+  }
+  initializeMermaid();
+}
+
+function initializeMermaid() {
+  mermaid.initialize({
+    startOnLoad: false,
+    securityLevel: "strict",
+    theme: effectiveTheme() === "dark" ? "dark" : "neutral",
+    flowchart: { htmlLabels: false, useMaxWidth: true },
+  });
+}
+
+function effectiveTheme() {
+  return theme.value === "system" ? (colorScheme.matches ? "dark" : "light") : theme.value;
 }
