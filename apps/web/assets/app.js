@@ -250,10 +250,22 @@ function applyTheme(preference) {
 }
 
 function initializeMermaid() {
+  const isDark = effectiveTheme() === "dark";
   mermaid.initialize({
     startOnLoad: false,
     securityLevel: "strict",
-    theme: effectiveTheme() === "dark" ? "dark" : "neutral",
+    theme: isDark ? "dark" : "neutral",
+    themeVariables: isDark
+      ? {
+          background: "#24352a",
+          primaryColor: "#365340",
+          primaryBorderColor: "#78a086",
+          primaryTextColor: "#eef7f0",
+          secondaryColor: "#2e4738",
+          tertiaryColor: "#2a3e31",
+          lineColor: "#a6c5ae",
+        }
+      : {},
     flowchart: { htmlLabels: false, useMaxWidth: true },
   });
 }
